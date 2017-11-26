@@ -9,7 +9,9 @@ class App extends Component {
 
     this.state = {
       currencies:'',
-      cryptoCurrency : ''
+      cryptoCurrency : '',
+      hideResult :false,
+      dataReturned : ''
     };
     this.bindCurrency = this.bindCurrency.bind(this);
     this.changeCryptoCurrency = this.changeCryptoCurrency.bind(this);
@@ -25,9 +27,18 @@ class App extends Component {
 
   getRates(currencies){
     axios.get(
-      `/Mine/Get?crypto=${this.state.cryptoCurrency}&currencies=${this.state.currencies}`
+      `/Mine/Get?crypto=${this.state.cryptoCurrency.replace()}&currencies=${this.state.currencies}`
     ).then(data=>{
       console.dir(data.data);
+      let res = '';
+      for (const key in data.data){
+        res+= `${key}: ${data.data[key]} \n`
+      }
+      this.setState({
+        dataReturned: res
+      });
+    }).catch(error=>{
+      console.log(error);
     });
   }
 
@@ -54,7 +65,12 @@ class App extends Component {
           <option value="XMR">Monero</option>
         </select>
         <button onClick={this.getRates} >Get rates</button>
+        <div id="displayArea" hidden={this.state.hideResult} 
+        style={ {'white-space': 'pre-line'} }>
+          {this.state.dataReturned}
+        </div>
       </div>
+     
     );
   }
 }
